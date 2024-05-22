@@ -90,13 +90,21 @@ public function store(Request $request)
         return view('products.edit', compact('product'));
     }
 
-    public function destroy(Product $product)
-    {
-        $product->delete();
+    public function destroy($id)
+{
+    $product = Product::find($id);
 
-        return redirect()->route('products.index');
+    // Delete the associated rents
+    foreach ($product->rents as $rent) {
+        $rent->delete();
     }
 
+    // Now you can delete the product
+    $product->delete();
+
+    return redirect()->route('products.index')
+                    ->with('success','Product deleted successfully');
+}
     public function update(Request $request, Product $product)
     {
         $data = $request->except('_token', '_method');
